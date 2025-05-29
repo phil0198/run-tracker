@@ -1,7 +1,6 @@
 const form = document.getElementById('runForm');
 const runList = document.getElementById('runList');
 const weatherBox = document.getElementById('weatherInfo');
-const apiKey = "ab63bd2638cb30de5bd2d8a1cf8d372b"; // Your API key here
 
 // Load runs from localStorage on page load
 window.onload = () => {
@@ -9,7 +8,7 @@ window.onload = () => {
   savedRuns.forEach(renderRun);
 };
 
-form.addEventListener('submit', async (e) => {
+form.addEventListener('submit', (e) => {
   e.preventDefault();
   console.log("Form submitted");
 
@@ -18,43 +17,49 @@ form.addEventListener('submit', async (e) => {
   const date = document.getElementById('date').value;
   const time = document.getElementById('time').value;
   const location = document.getElementById('location').value;
+  const manualTemp = document.getElementById('manualTemp').value;
+  const manualConditions = document.getElementById('manualConditions').value;
 
   if (!date || !time || !location) {
     alert("Please fill out the date, time, and location fields.");
     return;
   }
 
-  const datetime = new Date(`${date}T${time}`);
-  const timestamp = Math.floor(datetime.getTime() / 1000);
+  const weather = manualTemp && manualConditions
+    ? { temp: manualTemp, conditions: manualConditions }
+    : getEstimatedWeather(getSeason(new Date(date).getMonth()));
 
-  try {
-    const coords = await getCoordinates(location);
-    console.log("Coordinates fetched:", coords);
+  const runData = {
+    distance,
+    duration,
+    date,
+    time,
+    location,
+    weather
+  };
 
-    const weather = await getWeather(coords.lat, coords.lon, timestamp);
-    console.log("Weather fetched:", weather);
-
-    const runData = {
-      distance,
-      duration,
-      date,
-      time,
-      location,
-      weather: {
-        temp: weather.temp,
-        conditions: weather.description
-      }
-    };
-
-    saveRun(runData);
-    renderRun(runData);
-    showWeather(weather);
-    form.reset();
-  } catch (err) {
-    alert('Error fetching weather or location. Please check your input.');
-    console.error("Error:", err);
-  }
+  saveRun(runData);
+  renderRun(runData);
+  showWeather(runData.weather);
+  form.reset();
 });
+
+function getSeason(month) {
+  if (month >= 2 && month <= 4) return 'spring';
+  if (month >= 5 && month <= 7) return 'summer';
+  if (month >= 8 && month <= 10) return 'fall';
+  return 'winter';
+}
+
+function getEstimatedWeather(season) {
+  const weatherOptions = {
+    spring: { temp: '55°F', conditions: 'Partly cloudy' },
+    summer: { temp: '75°F', conditions: 'Sunny' },
+    fall: { temp: '60°F', conditions: 'Overcast' },
+    winter: { temp: '35°F', conditions: 'Snowy' }
+  };
+  return weatherOptions[season];
+}
 
 function saveRun(run) {
   const runs = JSON.parse(localStorage.getItem('runTrackerData')) || [];
@@ -70,7 +75,7 @@ function renderRun(run) {
     <h3>${run.date} – ${run.distance} mi</h3>
     <p>Duration: ${run.duration}</p>
     <p>Location: ${run.location}</p>
-    <p>Weather: ${run.weather.temp}°F, ${run.weather.conditions}</p>
+    <p>Weather: ${run.weather.temp}, ${run.weather.conditions}</p>
   `;
 
   runList.prepend(card);
@@ -78,30 +83,5 @@ function renderRun(run) {
 
 function showWeather(weather) {
   weatherBox.style.display = 'block';
-  weatherBox.textContent = `Fetched weather: ${weather.temp}°F, ${weather.description}`;
-}
-
-async function getCoordinates(location) {
-  const response = await fetch(
-    `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(location)}&limit=1&appid=${apiKey}`
-  );
-  if (!response.ok) throw new Error('Failed to fetch coordinates.');
-  const data = await response.json();
-  if (!data.length) throw new Error('Location not found.');
-  return { lat: data[0].lat, lon: data[0].lon };
-}
-
-async function getWeather(lat, lon, timestamp) {
-  const response = await fetch(
-    `https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=${lat}&lon=${lon}&dt=${timestamp}&units=imperial&appid=${apiKey}`
-  );
-  if (!response.ok) throw new Error('Failed to fetch weather.');
-  const data = await response.json();
-  if (!data.current || !data.current.weather || !data.current.weather.length) {
-    throw new Error('No weather data found.');
-  }
-  return {
-    temp: data.current.temp,
-    description: data.current.weather[0].description
-  };
-}
+  weatherBox.textContent = `Weather: ${weather.temp}, ${weather.conditions}`;
+}  
