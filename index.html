@@ -1,177 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Run Tracker</title>
+  <link rel="icon" href="favicon.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #f9fafb;
-      color: #111827;
-    }
-
-    nav {
-      background-color: #0f172a;
-      color: white;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-
-    .nav-links {
-      display: flex;
-    }
-
-    .nav-links a {
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-      margin-right: 1rem;
-    }
-
-    @media (max-width: 640px) {
-      .nav-links {
-        display: none;
-        flex-direction: column;
-        background-color: #0f172a;
-        position: absolute;
-        top: 60px;
-        right: 0;
-        width: 100%;
-        text-align: center;
-        padding: 1rem 0;
-      }
-
-      .nav-links.active {
-        display: flex;
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-    }
-
-    main {
-      padding: 1rem;
-      max-width: 800px;
-      margin: auto;
-    }
-
-    section {
-      margin-bottom: 3rem;
-    }
-
-    h2 {
-      font-size: 1.25rem;
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
-
-    form {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    }
-
-    form label {
-      display: block;
-      margin-bottom: 1rem;
-      font-size: 0.95rem;
-    }
-
-    input {
-      width: 100%;
-      padding: 0.75rem;
-      margin-top: 0.25rem;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-
-    button {
-      margin-top: 1rem;
-      width: 100%;
-      background-color: #2563eb;
-      color: white;
-      border: none;
-      padding: 0.75rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-
-    button:hover {
-      background-color: #1d4ed8;
-    }
-
-    .weather-summary {
-      display: none;
-      margin-top: 1rem;
-      padding: 1rem;
-      background-color: #e0f2fe;
-      color: #0369a1;
-      border-radius: 8px;
-      font-size: 0.95rem;
-    }
-
-    .run-card {
-      background: white;
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .run-card h3 {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    .run-card p {
-      margin: 0.25rem 0;
-      font-size: 0.95rem;
-      color: #4b5563;
-    }
-
-    footer {
-      text-align: center;
-      padding: 2rem 1rem;
-      font-size: 0.875rem;
-      color: #6b7280;
-    }
-  </style>
 </head>
 <body>
-  <nav>
-    <div><strong>RunTracker</strong></div>
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    <div class="nav-links" id="navLinks">
-      <a href="index.html">Home</a>
-      <a href="run-history.html">Run History</a>
-    </div>
-  </nav>
-
   <main>
     <section id="log-run">
       <h2>Log a New Run</h2>
@@ -197,7 +33,16 @@
           Location
           <input type="text" id="location" placeholder="e.g. Westminster, CO" required />
         </label>
+        <label>
+          Temp (e.g. 68°F)
+          <input type="text" id="manualTemp" placeholder="Optional" />
+        </label>
+        <label>
+          Conditions (e.g. Sunny)
+          <input type="text" id="manualConditions" placeholder="Optional" />
+        </label>
         <button type="submit">Save Run</button>
+        <button type="button" id="importStrava">Import from Strava</button>
         <div id="weatherInfo" class="weather-summary"></div>
       </form>
     </section>
@@ -210,16 +55,7 @@
     </section>
   </main>
 
-  <footer>
-    &copy; 2025 RunTracker – Built by runners, for runners.
-  </footer>
-
   <script>
-    function toggleMenu() {
-      const nav = document.getElementById('navLinks');
-      nav.classList.toggle('active');
-    }
-
     function fillTodayDate() {
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('date').value = today;
