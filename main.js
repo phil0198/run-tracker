@@ -20,7 +20,13 @@ form.addEventListener('submit', async (e) => {
   const location = document.getElementById('location').value;
 
   const datetime = new Date(`${date}T${time}`);
+  const now = Date.now();
   const timestamp = Math.floor(datetime.getTime() / 1000);
+
+  if (datetime.getTime() > now) {
+    alert("Date/time cannot be in the future.");
+    return;
+  }
 
   try {
     const coords = await getCoordinates(location);
@@ -47,7 +53,7 @@ form.addEventListener('submit', async (e) => {
     form.reset();
   } catch (err) {
     alert('Error fetching weather or location. Please check your input.');
-    console.error("Error:", err);
+    console.error("Detailed error:", err.message);
   }
 });
 
