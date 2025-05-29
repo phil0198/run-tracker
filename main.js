@@ -1,7 +1,7 @@
 const form = document.getElementById('runForm');
 const runList = document.getElementById('runList');
 const weatherBox = document.getElementById('weatherInfo');
-const apiKey = "ab63bd2638cb30de5bd2d8a1cf8d372b"; // Replace with your actual API key
+const apiKey = "ab63bd2638cb30de5bd2d8a1cf8d372b"; // Your API key here
 
 // Load runs from localStorage on page load
 window.onload = () => {
@@ -11,6 +11,7 @@ window.onload = () => {
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
+  console.log("Form submitted");
 
   const distance = document.getElementById('distance').value;
   const duration = document.getElementById('duration').value;
@@ -23,7 +24,10 @@ form.addEventListener('submit', async (e) => {
 
   try {
     const coords = await getCoordinates(location);
+    console.log("Coordinates fetched:", coords);
+
     const weather = await getWeather(coords.lat, coords.lon, timestamp);
+    console.log("Weather fetched:", weather);
 
     const runData = {
       distance,
@@ -43,7 +47,7 @@ form.addEventListener('submit', async (e) => {
     form.reset();
   } catch (err) {
     alert('Error fetching weather or location. Please check your input.');
-    console.error(err);
+    console.error("Error:", err);
   }
 });
 
@@ -83,13 +87,12 @@ async function getCoordinates(location) {
 
 async function getWeather(lat, lon, timestamp) {
   const response = await fetch(
-    `https://api.openweathermap.org/data/3.0/onecall/timemachine?lat=${lat}&lon=${lon}&dt=${timestamp}&units=imperial&appid=${apiKey}`
+    `https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=${lat}&lon=${lon}&dt=${timestamp}&units=imperial&appid=${apiKey}`
   );
   const data = await response.json();
-  if (!data.data || !data.data.length) throw new Error('No weather data found.');
-  const weather = data.data[0].weather[0];
+  if (!data.current) throw new Error('No weather data found.');
   return {
-    temp: data.data[0].temp,
-    description: weather.description
+    temp: data.current.temp,
+    description: data.current.weather[0].description
   };
 }
