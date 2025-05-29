@@ -19,14 +19,13 @@ form.addEventListener('submit', async (e) => {
   const time = document.getElementById('time').value;
   const location = document.getElementById('location').value;
 
-  const datetime = new Date(`${date}T${time}`);
-  const now = Date.now();
-  const timestamp = Math.floor(datetime.getTime() / 1000);
-
-  if (datetime.getTime() > now) {
-    alert("Date/time cannot be in the future.");
+  if (!date || !time || !location) {
+    alert("Please fill out the date, time, and location fields.");
     return;
   }
+
+  const datetime = new Date(`${date}T${time}`);
+  const timestamp = Math.floor(datetime.getTime() / 1000);
 
   try {
     const coords = await getCoordinates(location);
@@ -53,7 +52,7 @@ form.addEventListener('submit', async (e) => {
     form.reset();
   } catch (err) {
     alert('Error fetching weather or location. Please check your input.');
-    console.error("Detailed error:", err.message);
+    console.error("Error:", err);
   }
 });
 
@@ -86,6 +85,7 @@ async function getCoordinates(location) {
   const response = await fetch(
     `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(location)}&limit=1&appid=${apiKey}`
   );
+  if (!response.ok) throw new Error('Failed to fetch coordinates.');
   const data = await response.json();
   if (!data.length) throw new Error('Location not found.');
   return { lat: data[0].lat, lon: data[0].lon };
@@ -95,8 +95,11 @@ async function getWeather(lat, lon, timestamp) {
   const response = await fetch(
     `https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=${lat}&lon=${lon}&dt=${timestamp}&units=imperial&appid=${apiKey}`
   );
+  if (!response.ok) throw new Error('Failed to fetch weather.');
   const data = await response.json();
-  if (!data.current) throw new Error('No weather data found.');
+  if (!data.current || !data.current.weather || !data.current.weather.length) {
+    throw new Error('No weather data found.');
+  }
   return {
     temp: data.current.temp,
     description: data.current.weather[0].description
