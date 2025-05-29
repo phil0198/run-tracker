@@ -1,6 +1,7 @@
 const form = document.getElementById('runForm');
 const runList = document.getElementById('runList');
 const weatherBox = document.getElementById('weatherInfo');
+const stravaButton = document.getElementById('importStrava');
 
 // Load runs from localStorage on page load
 window.onload = () => {
@@ -84,4 +85,15 @@ function renderRun(run) {
 function showWeather(weather) {
   weatherBox.style.display = 'block';
   weatherBox.textContent = `Weather: ${weather.temp}, ${weather.conditions}`;
-}  
+}
+
+// OAuth login to Strava
+if (stravaButton) {
+  stravaButton.addEventListener('click', () => {
+    const clientId = '162040';
+    const redirectUri = 'https://phil0198.github.io/';
+    const scope = 'activity:read';
+    const authUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&response_type=token&redirect_uri=${redirectUri}&approval_prompt=auto&scope=${scope}`;
+    window.location.href = authUrl;
+  });
+}
