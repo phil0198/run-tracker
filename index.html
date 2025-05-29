@@ -187,6 +187,7 @@
         <label>
           Date
           <input type="date" id="date" required />
+          <button type="button" onclick="fillTodayDate()">Use Today's Date</button>
         </label>
         <label>
           Time
@@ -217,6 +218,11 @@
     function toggleMenu() {
       const nav = document.getElementById('navLinks');
       nav.classList.toggle('active');
+    }
+
+    function fillTodayDate() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('date').value = today;
     }
   </script>
   <script src="main.js"></script>
