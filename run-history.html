@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Run History</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafb;
+      color: #111827;
+      padding: 0;
+    }
+
+    nav {
+      background-color: #0f172a;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      margin-right: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        background-color: #0f172a;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 100%;
+        text-align: center;
+        padding: 1rem 0;
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+    }
+
+    h1 {
+      text-align: center;
+      color: #0f172a;
+      margin-top: 2rem;
+    }
+
+    .run-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1rem;
+      margin: 1rem auto;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      max-width: 600px;
+    }
+
+    .run-card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .run-card p {
+      margin: 0.25rem 0;
+      font-size: 0.95rem;
+      color: #4b5563;
+    }
+
+    .no-runs {
+      text-align: center;
+      color: #6b7280;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div><strong>RunTracker</strong></div>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="run-history.html">Run History</a>
+    </div>
+  </nav>
+
+  <h1>🏃‍♂️ Your Run History</h1>
+  <div id="runList">
+    <!-- Run cards will appear here -->
+  </div>
+
+  <p class="no-runs" id="noRunsMsg">No runs logged yet. Go back and log your first run!</p>
+
+  <script>
+    function toggleMenu() {
+      const nav = document.getElementById('navLinks');
+      nav.classList.toggle('active');
+    }
+
+    const runList = document.getElementById('runList');
+    const noRunsMsg = document.getElementById('noRunsMsg');
+
+    const savedRuns = JSON.parse(localStorage.getItem('runTrackerData')) || [];
+
+    if (savedRuns.length === 0) {
+      noRunsMsg.style.display = 'block';
+    } else {
+      noRunsMsg.style.display = 'none';
+      savedRuns.forEach(run => {
+        const card = document.createElement('div');
+        card.className = 'run-card';
+        card.innerHTML = `
+          <h3>${run.date} – ${run.distance} mi</h3>
+          <p>Duration: ${run.duration}</p>
+          <p>Location: ${run.location}</p>
+          <p>Weather: ${run.weather.temp}°F, ${run.weather.conditions}</p>
+        `;
+        runList.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
