@@ -17,23 +17,55 @@
       color: #111827;
     }
 
-    header {
+    nav {
       background-color: #0f172a;
       color: white;
-      padding: 2rem 1rem;
-      text-align: center;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
       font-weight: 600;
+      margin-right: 1rem;
     }
 
-    header p {
-      margin-top: 0.5rem;
-      font-size: 1rem;
-      opacity: 0.85;
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        background-color: #0f172a;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 100%;
+        text-align: center;
+        padding: 1rem 0;
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
     }
 
     main {
@@ -128,28 +160,17 @@
       font-size: 0.875rem;
       color: #6b7280;
     }
-
-    @media (min-width: 640px) {
-      header h1 {
-        font-size: 2.5rem;
-      }
-
-      main {
-        padding: 2rem;
-      }
-
-      button {
-        width: auto;
-        padding: 0.75rem 2rem;
-      }
-    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>🏃‍♂️ Run Tracker</h1>
-    <p>Log. Reflect. Optimize your performance.</p>
-  </header>
+  <nav>
+    <div><strong>RunTracker</strong></div>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="run-history.html">Run History</a>
+    </div>
+  </nav>
 
   <main>
     <section id="log-run">
@@ -192,6 +213,12 @@
     &copy; 2025 RunTracker – Built by runners, for runners.
   </footer>
 
+  <script>
+    function toggleMenu() {
+      const nav = document.getElementById('navLinks');
+      nav.classList.toggle('active');
+    }
+  </script>
   <script src="main.js"></script>
 </body>
 </html>
